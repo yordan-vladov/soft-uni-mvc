@@ -1,0 +1,33 @@
+@model EmployeeProject
+
+@{
+    ViewData["Title"] = "Create Assignment";
+}
+
+<h1>Create</h1>
+
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group mb-3">
+        <label asp-for="EmployeeId" class="control-label">Employee</label>
+        <select asp-for="EmployeeId" class="form-control" asp-items="ViewBag.EmployeeId">
+            <option value="">-- Select Employee --</option>
+        </select>
+        <span asp-validation-for="EmployeeId" class="text-danger"></span>
+    </div>
+    <div class="form-group mb-3">
+        <label asp-for="ProjectId" class="control-label">Project</label>
+        <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId">
+            <option value="">-- Select Project --</option>
+        </select>
+        <span asp-validation-for="ProjectId" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

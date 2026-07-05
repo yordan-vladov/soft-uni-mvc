@@ -1,0 +1,43 @@
+@model IEnumerable<Employee>
+
+@{
+    ViewData["Title"] = "Employees";
+}
+
+<h1>Employees</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.FirstName)</th>
+            <th>@Html.DisplayNameFor(model => model.LastName)</th>
+            <th>@Html.DisplayNameFor(model => model.JobTitle)</th>
+            <th>Department</th>
+            <th>Manager</th>
+            <th>@Html.DisplayNameFor(model => model.HireDate)</th>
+            <th>@Html.DisplayNameFor(model => model.Salary)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.FirstName)</td>
+            <td>@Html.DisplayFor(modelItem => item.LastName)</td>
+            <td>@Html.DisplayFor(modelItem => item.JobTitle)</td>
+            <td>@item.Department?.Name</td>
+            <td>@item.Manager?.FirstName @item.Manager?.LastName</td>
+            <td>@item.HireDate.ToString("yyyy-MM-dd")</td>
+            <td>@item.Salary.ToString("N2")</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.EmployeeId" class="btn btn-sm btn-outline-secondary">Edit</a>
+                <a asp-action="Details" asp-route-id="@item.EmployeeId" class="btn btn-sm btn-outline-secondary">Details</a>
+                <a asp-action="Delete" asp-route-id="@item.EmployeeId" class="btn btn-sm btn-outline-danger">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

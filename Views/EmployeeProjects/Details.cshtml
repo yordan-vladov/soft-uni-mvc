@@ -1,0 +1,19 @@
+@model EmployeeProject
+
+@{
+    ViewData["Title"] = "Assignment Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">Employee</dt>
+        <dd class="col-sm-10">@Model.Employee.FirstName @Model.Employee.LastName</dd>
+        <dt class="col-sm-2">Project</dt>
+        <dd class="col-sm-10">@Model.Project.Name</dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>
