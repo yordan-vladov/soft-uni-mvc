@@ -27,10 +27,52 @@ public class EmployeesController : Controller
         ViewData["AddressId"] = new SelectList(_context.Addresses.OrderBy(a => a.AddressText), "AddressId", "AddressText", employee?.AddressId);
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? searchString, int? departmentId, string? sortOrder, int? pageNumber)
     {
-        var employees = _context.Employees.Include(e => e.Department).Include(e => e.Manager);
-        return View(await employees.ToListAsync());
+        ViewData["CurrentSort"] = sortOrder;
+        ViewData["CurrentFilter"] = searchString;
+        ViewData["CurrentDepartment"] = departmentId;
+        ViewData["NameSortParam"] = string.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+        ViewData["JobTitleSortParam"] = sortOrder == "jobtitle" ? "jobtitle_desc" : "jobtitle";
+        ViewData["DepartmentSortParam"] = sortOrder == "department" ? "department_desc" : "department";
+        ViewData["HireDateSortParam"] = sortOrder == "hiredate" ? "hiredate_desc" : "hiredate";
+        ViewData["SalarySortParam"] = sortOrder == "salary" ? "salary_desc" : "salary";
+
+        ViewData["DepartmentFilter"] = new SelectList(_context.Departments.OrderBy(d => d.Name), "DepartmentId", "Name", departmentId);
+
+        var employees = _context.Employees.Include(e => e.Department).Include(e => e.Manager).AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(searchString))
+        {
+            employees = employees.Where(e =>
+                e.FirstName.Contains(searchString) ||
+                e.LastName.Contains(searchString) ||
+                e.MiddleName!.Contains(searchString) ||
+                e.JobTitle.Contains(searchString));
+        }
+
+        if (departmentId.HasValue)
+        {
+            employees = employees.Where(e => e.DepartmentId == departmentId);
+        }
+
+        employees = sortOrder switch
+        {
+            "name_desc" => employees.OrderByDescending(e => e.FirstName).ThenByDescending(e => e.LastName),
+            "jobtitle" => employees.OrderBy(e => e.JobTitle),
+            "jobtitle_desc" => employees.OrderByDescending(e => e.JobTitle),
+            "department" => employees.OrderBy(e => e.Department.Name),
+            "department_desc" => employees.OrderByDescending(e => e.Department.Name),
+            "hiredate" => employees.OrderBy(e => e.HireDate),
+            "hiredate_desc" => employees.OrderByDescending(e => e.HireDate),
+            "salary" => employees.OrderBy(e => e.Salary),
+            "salary_desc" => employees.OrderByDescending(e => e.Salary),
+            _ => employees.OrderBy(e => e.FirstName).ThenBy(e => e.LastName),
+        };
+
+        const int pageSize = 10;
+        var paginatedEmployees = await PaginatedList<Employee>.CreateAsync(employees, pageNumber ?? 1, pageSize);
+        return View(paginatedEmployees);
     }
 
     public async Task<IActionResult> Details(int? id)

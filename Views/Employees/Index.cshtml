@@ -1,4 +1,4 @@
-@model IEnumerable<Employee>
+@model PaginatedList<Employee>
 
 @{
     ViewData["Title"] = "Employees";
@@ -9,16 +9,42 @@
 <p>
     <a asp-action="Create" class="btn btn-primary">Create New</a>
 </p>
+
+<form asp-action="Index" method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input type="text" name="searchString" value="@ViewData["CurrentFilter"]" class="form-control" placeholder="Search by name or job title..." />
+    </div>
+    <div class="col-auto">
+        <select name="departmentId" asp-items="ViewBag.DepartmentFilter" class="form-select">
+            <option value="">All Departments</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
 <table class="table">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(model => model.FirstName)</th>
-            <th>@Html.DisplayNameFor(model => model.LastName)</th>
-            <th>@Html.DisplayNameFor(model => model.JobTitle)</th>
-            <th>Department</th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParam"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-departmentId="@ViewData["CurrentDepartment"]">@Html.DisplayNameFor(model => model.First().FirstName)</a>
+            </th>
+            <th>@Html.DisplayNameFor(model => model.First().LastName)</th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["JobTitleSortParam"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-departmentId="@ViewData["CurrentDepartment"]">@Html.DisplayNameFor(model => model.First().JobTitle)</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["DepartmentSortParam"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-departmentId="@ViewData["CurrentDepartment"]">Department</a>
+            </th>
             <th>Manager</th>
-            <th>@Html.DisplayNameFor(model => model.HireDate)</th>
-            <th>@Html.DisplayNameFor(model => model.Salary)</th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["HireDateSortParam"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-departmentId="@ViewData["CurrentDepartment"]">@Html.DisplayNameFor(model => model.First().HireDate)</a>
+            </th>
+            <th>
+                <a asp-action="Index" asp-route-sortOrder="@ViewData["SalarySortParam"]" asp-route-searchString="@ViewData["CurrentFilter"]" asp-route-departmentId="@ViewData["CurrentDepartment"]">@Html.DisplayNameFor(model => model.First().Salary)</a>
+            </th>
             <th></th>
         </tr>
     </thead>
@@ -41,3 +67,35 @@
 }
     </tbody>
 </table>
+
+@{
+    var previousDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+<nav>
+    <ul class="pagination">
+        <li class="page-item @previousDisabled">
+            <a asp-action="Index"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
+               asp-route-searchString="@ViewData["CurrentFilter"]"
+               asp-route-departmentId="@ViewData["CurrentDepartment"]"
+               class="page-link">
+                Previous
+            </a>
+        </li>
+        <li class="page-item disabled">
+            <span class="page-link">Page @Model.PageIndex of @Model.TotalPages</span>
+        </li>
+        <li class="page-item @nextDisabled">
+            <a asp-action="Index"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
+               asp-route-searchString="@ViewData["CurrentFilter"]"
+               asp-route-departmentId="@ViewData["CurrentDepartment"]"
+               class="page-link">
+                Next
+            </a>
+        </li>
+    </ul>
+</nav>
